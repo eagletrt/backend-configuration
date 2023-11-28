@@ -1,0 +1,7 @@
+[submodule "repos/telemetry-api"]
+	path = repos/telemetry-api
+	url = git@github.com:eagletrt/telemetry-api.git
+[submodule "repos/telemetry"]
+	path = repos/telemetry
+	url = git@github.com:eagletrt/telemetry.git
+	branch = feat/influx-logger
