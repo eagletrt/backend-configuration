@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  influx:
+    image: "influxdb:latest"
+    ports: 
+      - 8086:8086
+    networks:
+      - influx-network
+    restart: always
+    volumes:
+      - influx-data:/data
+networks:
+  api-network:
+  influx-network:
+volumes:
+  influx-data:
