@@ -8,9 +8,11 @@ services:
       - 443:443
       - 80:80
       - 1883:1883
+      - 27017:27017
     networks:
       - influx-network
       - api-network
+      - mongodb-network
     restart: always
     volumes:
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
@@ -42,9 +44,23 @@ services:
     volumes:
       - influx-data:/data
 
+  mongodb:
+    image: "mongo:latest"
+    hostname: "mongodb"
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - mongodb-network
+
 networks:
   api-network:
   influx-network:
+  mongodb-network:
 volumes:
   influx-data:
   api-temp-data:
+  mongodb-data:
