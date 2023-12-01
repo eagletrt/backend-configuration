@@ -40,11 +40,13 @@ services:
       - influx-network
     restart: always
     volumes:
-      - influx-data:/data
+      - influx-varlib-data:/var/lib/influxdb2
+      - influx-etc-data:/etc/influxdb2
 
 networks:
   api-network:
   influx-network:
 volumes:
-  influx-data:
+  influx-varlib-data:
+  influx-etc-data:
   api-temp-data:
