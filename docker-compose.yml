@@ -42,7 +42,8 @@ services:
       - influx-network
     restart: always
     volumes:
-      - influx-data:/data
+      - influx-varlib-data:/var/lib/influxdb2
+      - influx-etc-data:/etc/influxdb2
 
   mongodb:
     image: "mongo:latest"
@@ -61,6 +62,7 @@ networks:
   influx-network:
   mongodb-network:
 volumes:
-  influx-data:
+  influx-varlib-data:
+  influx-etc-data:
   api-temp-data:
   mongodb-data:
