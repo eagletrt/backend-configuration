@@ -9,10 +9,13 @@ services:
       - 80:80
       - 1883:1883
       - 27017:27017
+      - 1884:1884
+      # - 9001:9001
     networks:
       - influx-network
       - api-network
       - mongodb-network
+      - mosquitto-network
     restart: always
     volumes:
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
@@ -31,7 +34,6 @@ services:
     restart: always
     volumes:
       - api-temp-data:/app/tmp
-      - ${API_CONF_FILE}:/app/secrets/config.yaml
     environment:
       - CONFIG_PATH=/app/secrets/config.yaml
 
@@ -57,10 +59,22 @@ services:
     networks:
       - mongodb-network
 
+  mosquitto:
+    image: "eclipse-mosquitto"
+    hostname: "mosquitto"
+    restart: always
+    ports:
+      - 9001:9001
+    volumes:
+      - ./configs/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - mosquitto-network 
+
 networks:
   api-network:
   influx-network:
   mongodb-network:
+  mosquitto-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:

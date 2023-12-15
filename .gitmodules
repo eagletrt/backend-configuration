@@ -5,3 +5,6 @@
 	path = repos/telemetry
 	url = git@github.com:eagletrt/telemetry.git
 	branch = feat/influx-logger
+[submodule "repos/eagle-app"]
+	path = repos/eagle-app
+	url = git@github.com:yellowmotion/eagle-app.git
