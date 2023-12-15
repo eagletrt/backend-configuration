@@ -10,17 +10,19 @@ services:
       - 1883:1883
       - 27017:27017
       - 1884:1884
-      # - 9001:9001
+      - 9001:9001
     networks:
       - influx-network
       - api-network
       - mongodb-network
       - mosquitto-network
+      - eagle-app-network
     restart: always
     volumes:
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
       - ${INFLUX_CERTS_DIR}:/var/certs/influx
       - ${API_CERTS_DIR}:/var/certs/api
+      - ${EAGLE_APP_CERTS_DIR}:/var/certs/eagle-app
     env_file:
       - .env
 
@@ -34,8 +36,22 @@ services:
     restart: always
     volumes:
       - api-temp-data:/app/tmp
+      - ${API_CONF_FILE}:/app/secrets/config.yaml
     environment:
       - CONFIG_PATH=/app/secrets/config.yaml
+
+  eagle-app:
+    build:
+      context: ./repos/eagle-app
+      dockerfile: Dockerfile
+    hostname: eagle-app
+    networks:
+      - eagle-app-network
+      - mosquitto-network
+      - mongodb-network
+    restart: always
+    env_file:
+      - .eagle-app.env
 
   influx:
     image: "influxdb:latest"
@@ -63,8 +79,6 @@ services:
     image: "eclipse-mosquitto"
     hostname: "mosquitto"
     restart: always
-    ports:
-      - 9001:9001
     volumes:
       - ./configs/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
@@ -75,6 +89,7 @@ networks:
   influx-network:
   mongodb-network:
   mosquitto-network:
+  eagle-app-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:

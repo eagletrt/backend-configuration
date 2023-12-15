@@ -8,3 +8,4 @@
 [submodule "repos/eagle-app"]
 	path = repos/eagle-app
 	url = git@github.com:yellowmotion/eagle-app.git
+  branch = feature/issue-14/deployment
