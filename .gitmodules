@@ -8,4 +8,6 @@
 [submodule "repos/eagle-app"]
 	path = repos/eagle-app
 	url = git@github.com:yellowmotion/eagle-app.git
-  branch = feature/issue-14/deployment
+[submodule "repos/influx-logger"]
+	path = repos/influx-logger
+	url = git@github.com:eagletrt/influx-logger.git
