@@ -8,9 +8,9 @@ services:
       - 443:443
       - 80:80
       - 1883:1883
-      - 27017:27017
       - 1884:1884
       - 9001:9001
+      - 27017:27017
     networks:
       - influx-network
       - api-network
@@ -20,6 +20,7 @@ services:
     restart: always
     volumes:
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
+      - ${NGINX_LOGS_DIR}:/var/log/nginx
       - ${INFLUX_CERTS_DIR}:/var/certs/influx
       - ${API_CERTS_DIR}:/var/certs/api
       - ${EAGLE_APP_CERTS_DIR}:/var/certs/eagle-app
@@ -83,6 +84,18 @@ services:
       - ./configs/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
       - mosquitto-network 
+
+  influx-logger:
+    build:
+      context: ./repos/influx-logger
+      dockerfile: Dockerfile
+    volumes:
+      - ./configs/influx-logger.json:/configuration.json
+    networks:
+      - influx-network
+      - mosquitto-network
+      - api-network
+    restart: always
 
 networks:
   api-network:
