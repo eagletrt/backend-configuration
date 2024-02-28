@@ -88,7 +88,7 @@ services:
       context: ./repos/influx-logger
       dockerfile: Dockerfile
     volumes:
-      - ./configs/influx-logger.json:/configuration.json
+      - ${INFLUX_LOGGER_CONF_FILE}:/configuration.json
     networks:
       - influx-network
       - mosquitto-network
