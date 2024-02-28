@@ -21,9 +21,8 @@ services:
     volumes:
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
       - ${NGINX_LOGS_DIR}:/var/log/nginx
-      - ${INFLUX_CERTS_DIR}:/var/certs/influx
-      - ${API_CERTS_DIR}:/var/certs/api
-      - ${EAGLE_APP_CERTS_DIR}:/var/certs/eagle-app
+      - ${NGINX_CERTS_ARCHIVE_DIR}:/etc/letsencrypt/archive
+      - ${NGINX_CERTS_LIVE_DIR}:/etc/letsencrypt/live
     env_file:
       - .env
 
