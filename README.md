@@ -36,5 +36,5 @@ sudo docker compose up -d
 - `INFLUX_LOGGER_CONF_FILE`: Denotes the configuration file path for `Influx Logger`, facilitating efficient logging and data management capabilities.
 
 ### `.eagle-app.env`
-For additional environment variables specific to `EagleApp`, please refer to the [environment variables documentation of `EagleApp`](https://github.com/yellowmotion/eagle-app/blob/main/README.md#environment-variables)
+For additional environment variables specific to `EagleApp`, please refer to the [environment variables documentation of `EagleApp`](https://github.com/eagletrt/eagle-app/blob/main/README.md#environment-variables)
 
