@@ -16,6 +16,7 @@ services:
       - mongodb-network
       - mosquitto-network
       - eagle-app-network
+      - vaultwarden-network
     restart: always
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
@@ -94,12 +95,24 @@ services:
       - api-network
     restart: always
 
+  vaultwarden:
+    image: "vaultwarden/server"
+    hostname: "vaultwarden"
+    environment:
+      - DOMAIN=https://vaultwarden.eagletrt.it
+    volumes: 
+      - ./private/vaultwarden/vw-data:/data/
+    networks:
+      - vaultwarden-network 
+    restart: "unless-stopped"
+
 networks:
   api-network:
   influx-network:
   mongodb-network:
   mosquitto-network:
   eagle-app-network:
+  vaultwarden-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:
