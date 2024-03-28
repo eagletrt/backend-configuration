@@ -17,6 +17,7 @@ services:
       - mosquitto-network
       - eagle-app-network
       - vaultwarden-network
+      - ghost-network
     restart: always
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
@@ -104,7 +105,20 @@ services:
       - ./private/vaultwarden/vw-data:/data/
     networks:
       - vaultwarden-network 
-    restart: "unless-stopped"
+    restart: unless-stopped
+
+  ghost:
+    image: "ghost"
+    hostname: "ghost"
+    environment:
+      - NODE_ENV=development
+      # - url=app.eagletrt.it
+    volumes:
+      - ghost-data:/var/lib/ghost/content
+      - ./configs/ghost.json:/var/lib/ghost/config.production.json
+    networks:
+      - ghost-network
+    restart: unless-stopped
 
 networks:
   api-network:
@@ -113,8 +127,10 @@ networks:
   mosquitto-network:
   eagle-app-network:
   vaultwarden-network:
+  ghost-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:
   mongodb-data:
-  api-temp-data: 
+  api-temp-data:
+  ghost-data:
