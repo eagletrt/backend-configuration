@@ -20,6 +20,7 @@ services:
       - vaultwarden-network
       - ghost-network
       - emqx-network
+      - bookstack-app-network
     restart: always
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
@@ -131,6 +132,39 @@ services:
       - ghost-network
     restart: unless-stopped
 
+  bookstack-app:
+    image: "lscr.io/linuxserver/bookstack"
+    hostname: bookstack-app
+    environment:
+      - APP_URL=https://docs.eagletrt.it 
+      - DB_HOST=bookstack-db
+      - DB_PORT=3306
+      - DB_USER=bookstack
+      - DB_PASS=${BOOKSTACK_DB_PASS}
+      - DB_DATABASE=bookstackapp
+    volumes:
+      - ./private/bookstack_app:/config
+    networks:
+      - bookstack-app-network
+      - bookstack-db-network
+    restart: always
+    depends_on:
+      - bookstack-db
+
+  bookstack-db:
+    image: "lscr.io/linuxserver/mariadb"
+    hostname: "bookstack-db"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${BOOKSTACK_DB_PASS}
+      - MYSQL_DATABASE=bookstackapp
+      - MYSQL_USER=bookstack
+      - MYSQL_PASSWORD=${BOOKSTACK_DB_PASS}
+    volumes:
+      - ./private/bookstack_db:/config
+    networks:
+      - bookstack-db-network
+    restart: always
+    
 networks:
   api-network:
   influx-network:
@@ -140,6 +174,8 @@ networks:
   vaultwarden-network:
   ghost-network:
   emqx-network:
+  bookstack-app-network:
+  bookstack-db-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:
