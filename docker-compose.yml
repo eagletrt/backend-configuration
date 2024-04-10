@@ -21,6 +21,7 @@ services:
       - ghost-network
       - emqx-network
       - bookstack-app-network
+      - uptime-kuma-network
     restart: always
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
@@ -164,6 +165,16 @@ services:
     networks:
       - bookstack-db-network
     restart: always
+
+  uptime-kuma:
+    image: "louislam/uptime-kuma:1"
+    hostname: "uptime-kuma"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./private/uptime_kuma:/app/data
+    networks:
+      - uptime-kuma-network
+    restart: unless-stopped
     
 networks:
   api-network:
@@ -176,6 +187,7 @@ networks:
   emqx-network:
   bookstack-app-network:
   bookstack-db-network:
+  uptime-kuma-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:
