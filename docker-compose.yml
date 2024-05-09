@@ -22,6 +22,7 @@ services:
       - emqx-network
       - bookstack-app-network
       - uptime-kuma-network
+      - authentik-server-network
     restart: always
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
@@ -175,6 +176,80 @@ services:
     networks:
       - uptime-kuma-network
     restart: unless-stopped
+
+  authentik:
+    image: 'ghcr.io/goauthentik/server'
+    command: 'server'
+    container_name: 'authentik'
+    hostname: 'authentik'
+    restart: 'unless-stopped'
+    environment:
+      - 'AUTHENTIK_SECRET_KEY=b3BlbnNzbCByYW5kIDYwCg=='
+      - 'AUTHENTIK_REDIS__HOST=authentik-redis'
+      - 'AUTHENTIK_POSTGRESQL__HOST=authentik-postgres'
+      - 'AUTHENTIK_POSTGRESQL__USER=authentik'
+      - 'AUTHENTIK_POSTGRESQL__PASSWORD=authentik'
+      - 'AUTHENTIK_POSTGRESQL__NAME=authentik'
+      - 'AUTHENTIK_COOKIE_DOMAIN=eagletrt.it'
+      - 'AUTHENTIK_ERROR_REPORTING__ENABLED=false'
+    volumes:
+      - './private/authentik/media:/media'
+      - './private/authentik/templates:/templates'
+    networks:
+      - 'authentik-network'
+      - 'authentik-server-network'
+      - 'authentik-redis-network'
+      - 'authentik-postgres-network'
+
+  authentik-worker:
+    image: 'ghcr.io/goauthentik/server'
+    command: 'worker'
+    container_name: 'authentik-worker'
+    restart: 'unless-stopped'
+    environment:
+      - 'AUTHENTIK_SECRET_KEY=b3BlbnNzbCByYW5kIDYwCg=='
+      - 'AUTHENTIK_REDIS__HOST=authentik-redis'
+      - 'AUTHENTIK_POSTGRESQL__HOST=authentik-postgres'
+      - 'AUTHENTIK_POSTGRESQL__USER=authentik'
+      - 'AUTHENTIK_POSTGRESQL__PASSWORD=authentik'
+      - 'AUTHENTIK_POSTGRESQL__PORT=5432'
+      - 'AUTHENTIK_POSTGRESQL__NAME=authentik'
+      - 'AUTHENTIK_ERROR_REPORTING__ENABLED=true'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - './private/authentik/media:/media'
+      - './private/authentik/templates:/templates'
+    networks:
+      - 'authentik-network'
+      - 'authentik-redis-network'
+      - 'authentik-postgres-network'
+    user: 'root'
+
+  authentik-redis:
+    image: 'redis'
+    container_name: 'authentik-redis'
+    hostname: 'authentik-redis'
+    restart: 'unless-stopped'
+    volumes:
+      - './private/authentik/redis/data:/data'
+    networks:
+      - 'authentik-redis-network'
+
+  authentik-postgres:
+    image: 'postgres:12-alpine'
+    container_name: 'authentik-postgres'
+    hostname: 'authentik-postgres'
+    restart: 'unless-stopped'
+    ports:
+      - '5432:5432'
+    volumes:
+      - './private/authentik/postgres/data:/var/lib/postgresql/data'
+    environment:
+      - 'POSTGRES_USER=authentik'
+      - 'POSTGRES_PASSWORD=authentik'
+      - 'POSTGRES_DB=authentik'
+    networks:
+      - 'authentik-postgres-network'
     
 networks:
   api-network:
@@ -188,6 +263,10 @@ networks:
   bookstack-app-network:
   bookstack-db-network:
   uptime-kuma-network:
+  authentik-network:
+  authentik-server-network:
+  authentik-redis-network:
+  authentik-postgres-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:
