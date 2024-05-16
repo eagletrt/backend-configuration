@@ -23,6 +23,7 @@ services:
       - bookstack-app-network
       - uptime-kuma-network
       - authentik-server-network
+      - keycloak-network
     restart: always
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
@@ -144,6 +145,8 @@ services:
       - DB_USER=bookstack
       - DB_PASS=${BOOKSTACK_DB_PASS}
       - DB_DATABASE=bookstackapp
+    env_file:
+      - './.bookstack.env'
     volumes:
       - ./private/bookstack_app:/config
     networks:
@@ -178,7 +181,7 @@ services:
     restart: unless-stopped
 
   authentik:
-    image: 'ghcr.io/goauthentik/server'
+    image: 'ghcr.io/goauthentik/server:2024.4.2'
     command: 'server'
     container_name: 'authentik'
     hostname: 'authentik'
@@ -202,7 +205,7 @@ services:
       - 'authentik-postgres-network'
 
   authentik-worker:
-    image: 'ghcr.io/goauthentik/server'
+    image: 'ghcr.io/goauthentik/server:2024.4.2'
     command: 'worker'
     container_name: 'authentik-worker'
     restart: 'unless-stopped'
@@ -250,7 +253,42 @@ services:
       - 'POSTGRES_DB=authentik'
     networks:
       - 'authentik-postgres-network'
-    
+
+  keycloak:
+    image: 'quay.io/keycloak/keycloak:latest'
+    command: 'start'
+    hostname: 'keycloak'
+    restart: 'unless-stopped'
+    networks:
+      - 'keycloak-network'
+    depends_on:
+      - 'keycloak-mariadb'
+    environment:
+      KC_DB: mariadb 
+      KC_DB_SCHEMA: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_DB_URL_HOST: keycloak-mariadb
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_PROXY: edge
+      KC_HOSTNAME_STRICT: false 
+      KC_HOSTNAME_URL: https://idp.eagletrt.it
+
+  keycloak-mariadb:
+    image: 'mariadb:latest'
+    hostname: 'keycloak-mariadb'
+    restart: 'unless-stopped'
+    networks:
+      - 'keycloak-network'
+    volumes:
+      - './private/keycloak_mariadb/data:/var/lib/mysql'
+    environment:
+      MARIADB_DATABASE: keycloak
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_USER: keycloak
+      MARIADB_PASSWORD: keycloak
+
 networks:
   api-network:
   influx-network:
@@ -267,6 +305,7 @@ networks:
   authentik-server-network:
   authentik-redis-network:
   authentik-postgres-network:
+  keycloak-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:
