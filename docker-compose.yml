@@ -24,6 +24,7 @@ services:
       - uptime-kuma-network
       - authentik-server-network
       - keycloak-network
+      - shlink-network
     restart: always
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf
@@ -289,6 +290,19 @@ services:
       MARIADB_USER: keycloak
       MARIADB_PASSWORD: keycloak
 
+  shlink:
+    image: 'shlinkio/shlink'
+    hostname: 'shlink'
+    restart: 'unless-stopped'
+    user: 'root'
+    volumes:
+      - './private/shlink/data:/etc/shlink/data:rw'
+    networks:
+      - 'shlink-network'
+    environment:
+      DEFAULT_DOMAIN: 'eagletrt.it'
+      IS_HTTPS_ENABLED: true
+
 networks:
   api-network:
   influx-network:
@@ -306,6 +320,7 @@ networks:
   authentik-redis-network:
   authentik-postgres-network:
   keycloak-network:
+  shlink-network:
 volumes:
   influx-varlib-data:
   influx-etc-data:
